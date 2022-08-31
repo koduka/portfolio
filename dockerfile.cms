@@ -1,0 +1,25 @@
+FROM node:16.17.0 as builder
+
+ENV NODE_ENV=production
+
+COPY ./strapi/app /app
+
+WORKDIR /app
+
+RUN yarn install && yarn build
+
+FROM node:16.17.0 AS runner
+
+ENV NODE_ENV=production
+
+COPY --from=builder /app/package.json ./app/
+COPY --from=builder /app/yarn.lock ./app/
+COPY --from=builder /app/dist ./app/dist
+
+WORKDIR /app
+
+RUN yarn install
+
+EXPOSE ${PORT}
+
+CMD yarn start

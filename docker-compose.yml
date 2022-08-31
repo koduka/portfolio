@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  web:
+    build: ./docker/node
+    tty: true
+    ports:
+      - 8000:8000
+    working_dir: /web
+    volumes:
+      - ./web:/web
+  strapi:
+    build: ./docker/node
+    tty: true
+    ports:
+      - 1337:1337
+    working_dir: /strapi/app
+    volumes:
+      - ./strapi/app:/strapi/app
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_NAME: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: password
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    # volumes:
+    #   - ./docker/postgres/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: password
